@@ -2,6 +2,9 @@ import { Link, useNavigate, useParams } from "react-router";
 import type { Route } from "./+types/home";
 import { useEffect, useState } from "react";
 import { usePuterStore } from "~/lib/puter";
+import Summary from "~/components/Summary";
+import Ats from "~/components/Ats";
+import Details from "~/components/Details";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -16,7 +19,7 @@ const Resume = () => {
 
   const [imageUrl, setImageUrl] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState<Feedback | null>();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,7 +48,8 @@ const Resume = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!isLoading && !auth.isAuthenticated) navigate(`/auth?next=/resume/${id}`);
+    if (!isLoading && !auth.isAuthenticated)
+      navigate(`/auth?next=/resume/${id}`);
   }, [isLoading]);
 
   return (
@@ -77,7 +81,12 @@ const Resume = () => {
           <h2 className="text-4xl text-black font-bold">Resume Review</h2>
           {feedback ? (
             <div className="flex flex-col gap-8 animate-in fade-in duration-1000">
-              Summary ATS Details
+              <Summary feedback={feedback} />
+              <Ats
+                score={feedback.ATS.score || 0}
+                suggestions={feedback.ATS.tips || []}
+              />
+              <Details feedback={feedback} />
             </div>
           ) : (
             <img
