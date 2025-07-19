@@ -1,6 +1,6 @@
-import Navbar from "~/components/Navbar";
+import Navbar from "../components/Navbar";
 import { useState, type FormEvent } from "react";
-import FileUploader from "~/components/FIleUploader";
+import FileUploader from "../components/FileUploader";
 
 const Upload = () => {
   const [isProcessing, setIsProcessing] = useState(false);
