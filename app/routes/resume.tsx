@@ -2,6 +2,9 @@ import { Link, useNavigate, useParams } from "react-router";
 import type { Route } from "./+types/home";
 import { useEffect, useState } from "react";
 import { usePuterStore } from "~/lib/puter";
+import Summary from "~/components/Summary";
+import Ats from "~/components/Ats";
+import Details from "~/components/Details";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -16,7 +19,7 @@ const Resume = () => {
 
   const [imageUrl, setImageUrl] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState<Feedback | null>();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +47,11 @@ const Resume = () => {
     loadResume();
   }, [id]);
 
+  useEffect(() => {
+    if (!isLoading && !auth.isAuthenticated)
+      navigate(`/auth?next=/resume/${id}`);
+  }, [isLoading]);
+
   return (
     <main className="~pt-0">
       <nav className="resume-nav">
@@ -58,7 +66,7 @@ const Resume = () => {
         <section className="feedback-section bg-[url('/images/bg-small.svg)] bg-cover h-[100vh] sticky top-0 items-center justify-center">
           {imageUrl && resumeUrl && (
             <div className="animate-in fade-in duration-1000 gradient-border max-sm:m-0 h-[90%] w-fit">
-              <a href="">
+              <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
                 <img
                   src={imageUrl}
                   alt="resume image"
@@ -67,6 +75,25 @@ const Resume = () => {
                 />
               </a>
             </div>
+          )}
+        </section>
+        <section className="feedback-section">
+          <h2 className="text-4xl text-black font-bold">Resume Review</h2>
+          {feedback ? (
+            <div className="flex flex-col gap-8 animate-in fade-in duration-1000">
+              <Summary feedback={feedback} />
+              <Ats
+                score={feedback.ATS.score || 0}
+                suggestions={feedback.ATS.tips || []}
+              />
+              <Details feedback={feedback} />
+            </div>
+          ) : (
+            <img
+              src="/images/resume-scan-2.gif"
+              className="w-full"
+              alt="scan gif"
+            />
           )}
         </section>
       </div>
